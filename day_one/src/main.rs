@@ -4,16 +4,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rotations = read_file("puzzle_input.txt");
     let mut pointer = 50;
     let mut count = 0;
-    
-    for rotation in rotations {
-        pointer = pointer + rotation;
-        (pointer, count) = turn_dial(pointer, count);
-    }
 
+    for rotation in rotations {
+        let distance_to_zero = distance_to_zero(rotation, pointer);
+        if rotation.abs() > distance_to_zero {
+            if distance_to_zero != 0 {
+                count += 1;
+            }
+
+            let full_rotations = (rotation.abs() - distance_to_zero) / 100; 
+            count += full_rotations;
+            pointer = turn_dial(pointer, &rotation);
+        } else {
+            pointer = turn_dial(pointer, &rotation);
+            if pointer == 0 {
+                count += 1;
+            }
+        }
+    }
+    
     println!("count: {}", count);
     println!("dial at: {}", pointer);
-    
+
     Ok(())
+}
+
+fn distance_to_zero(rotation: i32, pointer: i32) -> i32 {
+    match rotation > 0 {
+        true => 100 - pointer,
+        false => pointer
+    }
 }
 
 fn read_file(path: &str) -> Vec<i32> {
@@ -33,7 +53,9 @@ fn read_file(path: &str) -> Vec<i32> {
     rotations
 }
 
-fn turn_dial(mut pointer: i32, mut count: u32) -> (i32, u32) {
+fn turn_dial(mut pointer: i32, rotation: &i32) -> i32 {
+    pointer = pointer + rotation;
+
     while pointer < 0 {
         pointer = 100 + pointer
     }
@@ -42,9 +64,7 @@ fn turn_dial(mut pointer: i32, mut count: u32) -> (i32, u32) {
         pointer = pointer - 100
     }
 
-    if pointer == 0 {
-        count += 1
-    }
-
-    (pointer, count)
+    pointer
 }
+
+// 6496 // dial 93 is correct answer
