@@ -1,1 +1,1 @@
-https://adventofcode.com/
+https://adventofcode.com/2025
