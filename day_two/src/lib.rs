@@ -1,24 +1,27 @@
 use std::ops::RangeInclusive;
 
-// iterators are lazy in rust
-// this means we need to do something with it for it be called
-// i.e. call collect, or sum, or for loop, or fold
-// Strings are stored as a vector of u8 values
+fn check_if_duplicates(arr: Vec<&str>) -> bool {
+    let pattern: &str = arr[0];
+    
+    arr.iter().all(|&x| x == pattern)
+}
 
-pub fn find_invalid_ids(range: RangeInclusive<u64>) -> Vec<u64> {
-    let mut invalid_ids: Vec<u64> = vec![];
+pub fn find_invalid_ids(range: RangeInclusive<usize>) -> Vec<usize> {
+    let mut invalid_ids: Vec<usize> = vec![];
     for num in range {
         let stringified: String = num.to_string();
-        if stringified.len() % 2 != 0 {
-            continue
-        }
+        let mut midpoint = stringified.len() / 2;
+        for size in 1..=midpoint {
+            let vec: Vec<&str> = stringified.as_bytes()
+                .chunks(size)
+                .map(|chunk| std::str::from_utf8(chunk).unwrap())
+                .collect();
 
-        let midpoint = stringified.len() / 2;
-        let invalid = &stringified[..midpoint] == &stringified[midpoint..];
-        
-        if invalid == true {
-            invalid_ids.push(num);
-        };
+            if check_if_duplicates(vec) {
+                invalid_ids.push(num);
+                break
+            }
+        }
     }
 
     invalid_ids
@@ -36,7 +39,7 @@ fn first_range() -> Result<(), Box<dyn std::error::Error>> {
 fn second_range() -> Result<(), Box<dyn std::error::Error>> {
     let range = 95..=115;
     let result = find_invalid_ids(range.into());
-    assert_eq!(vec![99], result);
+    assert_eq!(vec![99, 111], result);
     Ok(())
 }
 
@@ -44,7 +47,23 @@ fn second_range() -> Result<(), Box<dyn std::error::Error>> {
 fn third_range() -> Result<(), Box<dyn std::error::Error>> {
     let range = 998..=1012;
     let result = find_invalid_ids(range.into());
-    assert_eq!(vec![1010], result);
+    assert_eq!(vec![999, 1010], result);
+    Ok(())
+}
+
+#[test]
+fn check_if_duplicates_works() -> Result<(), Box<dyn std::error::Error>> {
+    let arr = vec!["1", "1", "1"];
+    let result = check_if_duplicates(arr);
+    assert_eq!(true, result);
+    Ok(())
+}
+
+#[test]
+fn check_if_duplicates_works_still() -> Result<(), Box<dyn std::error::Error>> {
+    let arr = vec!["1", "1", "2", "1"];
+    let result = check_if_duplicates(arr);
+    assert_eq!(false, result);
     Ok(())
 }
 
