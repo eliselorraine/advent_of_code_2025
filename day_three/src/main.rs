@@ -2,31 +2,53 @@ use std::fs;
 
 fn main() {
     let banks = read_file("puzzle_input.txt");
-    let mut sum = 0;
+    let mut sum: u64 = 0;
     for bank in banks {
-        let highest_voltage = get_highest_voltage(&bank);
-        sum += highest_voltage;
+        let bank_sum: u64 = get_highest_voltage(&bank);
+        sum += bank_sum;
     }
 
     println!("{:?}", sum);
 }
 
-fn get_first_digit(bank: &[u32]) -> (usize, &u32) {
-    let max = get_max(&bank);
-    let idx = bank.iter().position(|x| x == max).unwrap();
-    (idx, max)
+fn get_highest_voltage(bank: &[u32]) -> u64 {
+    let mut remaining_iterations: u8 = 12;
+    let mut slice_idx: usize = 11;
+    let mut sum: u64 = 0;
+    let mut start_slice_idx: usize = 0;
+    let enumerated_bank: Vec<(usize, u32)> = bank
+        .iter()
+        .enumerate()
+        .map(|(idx, int)| (idx, *int))
+        .collect();
+
+    while remaining_iterations > 0 {
+        remaining_iterations -= 1;
+
+        let end_slice_idx: usize = bank.len() - slice_idx;
+        let slice = &enumerated_bank[start_slice_idx..end_slice_idx];
+        let (idx, digit) = get_max(slice);
+        sum += (digit as u64) * 10_u64.pow(slice_idx.try_into().unwrap());
+
+        if slice_idx > 0 {
+            slice_idx -= 1;
+        }
+
+        start_slice_idx = idx + 1;
+    }
+
+    sum
 }
 
-fn get_max(bank: &[u32]) -> &u32 {
-    bank.iter().max().unwrap()
-}
+fn get_max(bank: &[(usize, u32)]) -> (usize, u32) {
+    let mut max = bank[0];
+    for &t in bank.iter() {
+        if t.1 > max.1 {
+            max = t;
+        }
+    }
 
-fn get_highest_voltage(bank: &Vec<u32>) -> u32 {
-    let (idx, first_digit) = get_first_digit(&bank[..(bank.len() - 1)]);
-    let second_digit = get_max(&bank[(idx + 1)..]);
-    let highest_voltage = (first_digit * 10) + second_digit;
-
-    highest_voltage
+    max
 }
 
 fn read_file(path: &str) -> Vec<Vec<u32>> {
@@ -46,9 +68,9 @@ mod tests {
 
     #[test]
     fn bank_one() -> Result<(), Box<dyn std::error::Error>> {
-        let input: Vec<u32> = vec![9, 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1];
+        let input: Vec<u32> = vec![2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 7, 8];
         let result = get_highest_voltage(&input);
-        assert_eq!(98, result);
+        assert_eq!(434234234278, result);
         Ok(())
     }
 
@@ -56,15 +78,15 @@ mod tests {
     fn bank_two() -> Result<(), Box<dyn std::error::Error>> {
         let input: Vec<u32> = vec![8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9];
         let result = get_highest_voltage(&input);
-        assert_eq!(89, result);
+        assert_eq!(811111111119, result);
         Ok(())
     }
 
     #[test]
     fn bank_three() -> Result<(), Box<dyn std::error::Error>> {
-        let input: Vec<u32> = vec![2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 7, 8];
+        let input: Vec<u32> = vec![9, 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1];
         let result = get_highest_voltage(&input);
-        assert_eq!(78, result);
+        assert_eq!(987654321111, result);
         Ok(())
     }
 
@@ -72,20 +94,7 @@ mod tests {
     fn bank_four() -> Result<(), Box<dyn std::error::Error>> {
         let input: Vec<u32> = vec![8, 1, 8, 1, 8, 1, 9, 1, 1, 1, 1, 2, 1, 1, 1];
         let result = get_highest_voltage(&input);
-        assert_eq!(92, result);
-        Ok(())
-    }
-    
-    #[test]
-    fn bank_five() -> Result<(), Box<dyn std::error::Error>> {
-        let input: Vec<u32> = vec![8, 4, 5, 7, 8, 5];
-        let (idx, first_digit) = get_first_digit(&input[..(&input.len() - 1)]);
-        let second_digit = get_max(&input[(idx + 1)..]);
-        let voltage = get_highest_voltage(&input);
-        assert_eq!(idx, 0);
-        assert_eq!(&8, first_digit);
-        assert_eq!(&8, second_digit);
-        assert_eq!(88, voltage);
+        assert_eq!(888911112111, result);
         Ok(())
     }
 }
