@@ -4,10 +4,7 @@ fn main() {
     let grid = read_input("puzzle_input.txt");
     let mut total: usize = 0;
 
-    let removable_rolls = check_grid(&grid);
-    total += removable_rolls.len();
-
-    let _cleaned_grid = remove_rolls(&grid, removable_rolls);
+    total = check_grid(&grid, total);
 
     println!("{}", total);
 }
@@ -22,7 +19,7 @@ fn remove_rolls(grid: &Vec<Vec<char>>, remove_roll_coords: Vec<(usize, usize)>) 
     new_grid
 }
 
-fn check_grid(grid: &Vec<Vec<char>>) -> Vec<(usize, usize)> {
+fn check_grid(grid: &Vec<Vec<char>>, mut running_total: usize) -> usize {
     let mut removable_rolls: Vec<(usize, usize)> = Vec::new();
 
     for row in 0..grid.len() {
@@ -30,13 +27,19 @@ fn check_grid(grid: &Vec<Vec<char>>) -> Vec<(usize, usize)> {
             if grid[row][col] == '@' {
                 let count = look_around(&grid, row, col);
                 if count < 4 {
-                    removable_rolls.push((row, col))
+                    running_total += 1;
+                    removable_rolls.push((row, col));
                 }
             }
         }
     }
-
-    removable_rolls
+    
+    if removable_rolls.len() > 0 {
+        let cleaned_grid = remove_rolls(&grid, removable_rolls);
+        return check_grid(&cleaned_grid, running_total)
+    } 
+  
+    running_total
 }
 
 fn look_around(grid: &Vec<Vec<char>>, row: usize, col: usize) -> u8 {
