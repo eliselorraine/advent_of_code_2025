@@ -2,19 +2,41 @@ use std::fs;
 
 fn main() {
     let grid = read_input("puzzle_input.txt");
-    let mut total: u32 = 0;
-    for (row, line) in grid.iter().enumerate() {
-        for (col, item) in line.iter().enumerate() {
-            if *item == '@' {
+    let mut total: usize = 0;
+
+    let removable_rolls = check_grid(&grid);
+    total += removable_rolls.len();
+
+    let _cleaned_grid = remove_rolls(&grid, removable_rolls);
+
+    println!("{}", total);
+}
+
+fn remove_rolls(grid: &Vec<Vec<char>>, remove_roll_coords: Vec<(usize, usize)>) -> Vec<Vec<char>>{
+    let mut new_grid = grid.clone();
+
+    for coord in remove_roll_coords {
+        new_grid[coord.0][coord.1] = '.';
+    }
+
+    new_grid
+}
+
+fn check_grid(grid: &Vec<Vec<char>>) -> Vec<(usize, usize)> {
+    let mut removable_rolls: Vec<(usize, usize)> = Vec::new();
+
+    for row in 0..grid.len() {
+        for col in 0..grid[0].len() {
+            if grid[row][col] == '@' {
                 let count = look_around(&grid, row, col);
                 if count < 4 {
-                    total += 1
+                    removable_rolls.push((row, col))
                 }
             }
         }
     }
 
-    println!("{}", total);
+    removable_rolls
 }
 
 fn look_around(grid: &Vec<Vec<char>>, row: usize, col: usize) -> u8 {
