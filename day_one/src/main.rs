@@ -1,7 +1,9 @@
 use std::fs;
+use std::path::{Path, PathBuf};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let rotations = read_file("puzzle_input.txt");
+    let input_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("puzzle_input.txt");
+    let rotations = read_file(input_path);
     let mut pointer = 50;
     let mut count = 0;
 
@@ -36,7 +38,7 @@ fn distance_to_zero(rotation: i32, pointer: i32) -> i32 {
     }
 }
 
-fn read_file(path: &str) -> Vec<i32> {
+fn read_file(path: PathBuf) -> Vec<i32> {
     let content: String = fs::read_to_string(path).expect("Couldn't read file.");
     let mut rotations: Vec<i32> = vec![];
     for line in content.lines() {

@@ -1,7 +1,9 @@
 use std::fs;
+use std::path::{Path, PathBuf};
 
 fn main() {
-    let banks = read_file("puzzle_input.txt");
+    let input_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("puzzle_input.txt");
+    let banks = read_file(input_path);
     let mut sum: u64 = 0;
     for bank in banks {
         let bank_sum: u64 = get_highest_voltage(&bank);
@@ -51,7 +53,7 @@ fn get_max(bank: &[(usize, u32)]) -> (usize, u32) {
     max
 }
 
-fn read_file(path: &str) -> Vec<Vec<u32>> {
+fn read_file(path: PathBuf) -> Vec<Vec<u32>> {
     let content: String = fs::read_to_string(path).expect("Couldn't read file.");
     let mut banks: Vec<Vec<u32>> = vec![];
     for line in content.lines() {

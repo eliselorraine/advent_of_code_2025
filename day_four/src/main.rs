@@ -1,7 +1,9 @@
 use std::fs;
+use std::path::{Path, PathBuf};
 
 fn main() {
-    let grid = read_input("puzzle_input.txt");
+    let input_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("puzzle_input.txt");
+    let grid = read_input(input_path);
     let mut total: usize = 0;
 
     total = check_grid(&grid, total);
@@ -90,7 +92,7 @@ fn look_around(grid: &Vec<Vec<char>>, row: usize, col: usize) -> u8 {
     count
 }
 
-fn read_input(path: &str) -> Vec<Vec<char>> {
+fn read_input(path: PathBuf) -> Vec<Vec<char>> {
     let content = fs::read_to_string(path).expect("Couldn't read file.");
     let mut grid: Vec<Vec<char>> = Vec::new();
     for line in content.lines() {

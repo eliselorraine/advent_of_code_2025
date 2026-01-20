@@ -1,8 +1,10 @@
 use std::fs;
 use std::ops::RangeInclusive;
+use std::path::{Path, PathBuf};
 
 fn main() {
-    let ranges = read_input("puzzle_input.txt".into());
+    let input_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("puzzle_input.txt");
+    let ranges = read_input(input_path);
     let mut sum = 0;
     for range in ranges {
         let invalid_ids = find_invalid_ids(range);
@@ -12,7 +14,7 @@ fn main() {
     println!("{}", sum);
 }
 
-fn read_input(path: std::path::PathBuf) -> Vec<RangeInclusive<usize>> {
+fn read_input(path: PathBuf) -> Vec<RangeInclusive<usize>> {
     let content: String = fs::read_to_string(path).expect("Couldn't read file.");
 
     content
