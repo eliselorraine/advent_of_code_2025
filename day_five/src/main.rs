@@ -3,7 +3,7 @@ use std::ops::RangeInclusive;
 use std::path::{Path, PathBuf};
 
 fn main() {
-    let input_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("test_input.txt");
+    let input_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("puzzle_input.txt");
     let (mut ranges, _ids) = read_input(input_path);
     ranges.sort_by_key(|r| *r.start());
     let merged = merge(&ranges);
